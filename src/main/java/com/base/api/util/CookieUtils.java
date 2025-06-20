@@ -1,14 +1,20 @@
 package com.base.api.util;
 
-import org.springframework.util.SerializationUtils;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Optional;
 
 public class CookieUtils {
+    private static final Logger logger = LoggerFactory.getLogger(CookieUtils.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
@@ -17,7 +23,8 @@ public class CookieUtils {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(name)) {
                     //Only to test login with Google or facebook without a frontend.
-                    if (cookie.getName().equals("redirect_uri") && cookie.getValue() == null || cookie.getValue().isEmpty()) {
+                    if (cookie.getName().equals("redirect_uri") &&
+                        (cookie.getValue() == null || cookie.getValue().isEmpty())) {
                         cookie.setValue("http://localhost:8080/api/profile");
                     }
                     return Optional.of(cookie);
@@ -51,10 +58,24 @@ public class CookieUtils {
     }
 
     public static String serialize(Object object) {
-        return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(object));
+        try {
+            // Convert an object to JSON string and Base64 encode
+            return Base64.getUrlEncoder()
+                    .encodeToString(objectMapper.writeValueAsString(object).getBytes());
+        } catch (JsonProcessingException e) {
+            logger.error("Error serializing object", e);
+            return null;
+        }
     }
 
     public static <T> T deserialize(Cookie cookie, Class<T> cls) {
-        return cls.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
+        try {
+            String value = cookie.getValue();
+            String jsonStr = new String(Base64.getUrlDecoder().decode(value));
+            return objectMapper.readValue(jsonStr, cls);
+        } catch (IOException e) {
+            logger.error("Error deserializing cookie value", e);
+            return null;
+        }
     }
 }

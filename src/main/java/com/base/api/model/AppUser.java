@@ -40,6 +40,7 @@ public class AppUser implements Serializable {
     private String displayName;
 
     @Column(name = "picture", length = 1000)
+    @Builder.Default
     private String picture = "//ssl.gstatic.com/accounts/ui/avatar_2x.png";
 
     @JsonIgnore
@@ -54,10 +55,10 @@ public class AppUser implements Serializable {
     @JsonIgnore
     private String password;
 
-    @JsonIgnore
     @Enumerated(EnumType.STRING)
     private SocialProvider provider;
 
+    @Builder.Default
     private String status = UserStatus.ACTIVE.name();
 
     // bidirectional many-to-many association to Role

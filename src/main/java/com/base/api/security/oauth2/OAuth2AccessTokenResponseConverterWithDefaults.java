@@ -1,6 +1,7 @@
 package com.base.api.security.oauth2;
 
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -19,7 +20,7 @@ public class OAuth2AccessTokenResponseConverterWithDefaults implements Converter
     private OAuth2AccessToken.TokenType defaultAccessTokenType = OAuth2AccessToken.TokenType.BEARER;
 
     @Override
-    public OAuth2AccessTokenResponse convert(Map<String, Object> tokenResponseParameters) {
+    public OAuth2AccessTokenResponse convert(@NonNull Map<String, Object> tokenResponseParameters) {
         String accessToken = (String) tokenResponseParameters.get(OAuth2ParameterNames.ACCESS_TOKEN);
 
         OAuth2AccessToken.TokenType accessTokenType = this.defaultAccessTokenType;

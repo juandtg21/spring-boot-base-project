@@ -8,6 +8,7 @@ import com.base.api.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Override
     @Transactional
-    public void onApplicationEvent(final ContextRefreshedEvent event) {
+    public void onApplicationEvent(final @NonNull ContextRefreshedEvent event) {
         if (alreadySetup) {
             return;
         }
